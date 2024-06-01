@@ -1,64 +1,30 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	global "ethereum-parser/global"
+	models "ethereum-parser/models"
+	servers "ethereum-parser/servers"
+	services "ethereum-parser/services"
+	"ethereum-parser/storage"
+	"fmt"
 	"log"
-	"net/http"
-	"time"
+	"os"
 )
 
-type Response struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Id      int    `json:"id"`
-	Result  struct {
-		Transactions []any  `json:"transactions"`
-		Hash         string `json:"hash"`
-	} `json:"result"`
-}
-
 func main() {
+
+	file, err := os.OpenFile("parser.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Failed to open log file:", err)
+	}
+	defer file.Close()
+
+	log.SetOutput(file)
 	global.Initialize()
+	models.MemoryInitialize()
+	storage.NewMemoryStorage()
+	services.InitRestfulParser()
 
-	go func() {
-		for {
-			reqBody := bytes.NewBuffer([]byte(`{
-                "jsonrpc": "2.0",
-                "method": "eth_getBlockByNumber",
-                "params": [
-                    "latest",
-                    true
-                ],
-                "id": 1
-            }`))
-
-			resp, err := http.Post(global.GlobalConfig.Endpoint, "application/json", reqBody)
-			if err != nil {
-				log.Printf("Failed to send request: %v", err)
-				continue
-			}
-
-			// TODO: Handle response here
-			// resp.Body.Close()
-			responseStruct := &Response{}
-			err = json.NewDecoder(resp.Body).Decode(responseStruct)
-			if err != nil {
-				log.Printf("Failed to decode response: %v", err)
-				continue
-			}
-
-			// Now you can access the fields in the response
-			log.Printf("transactions: %s, hash: %s", responseStruct.Result.Transactions, responseStruct.Result.Hash)
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
-	// TODO: Other code here
-	select {}
+	fmt.Println("Server is running on port http://127.0.0.1:8080")
+	servers.InitrestfulServer()
 }
-
-// TODO:
-//1. 启动一个http client,接受subscribe, get tranactions
-//2. 实现parase 接口的函数，被http调用，是不是要controller。impl
-//3.保证内存安全，多个goroutine访问内存

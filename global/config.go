@@ -30,7 +30,7 @@ func Initialize() {
 		panic(err)
 	}
 	if GlobalConfig.Endpoint == "" {
-		log.Fatal("Error in config file. Both 'endpoint'field must be present and non-empty.")
+		log.Fatal("Error in config file. 'endpoint' field must be present and non-empty.")
 		panic(errors.New("Invalid config file"))
 	}
 }
