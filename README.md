@@ -28,6 +28,13 @@ make build
 ```
 
 ### Run
+Your working path should cotain cofig.json. For example:
+```bash
+{
+    "endpoint": "https://cloudflare-eth.com"
+}
+```
+Then
 ```bash
 ./ethereum-parser 
 ```
