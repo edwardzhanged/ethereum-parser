@@ -54,6 +54,7 @@ func (rp *RestfulParser) GetCurrentBlock() (int, error) {
 
 func (rp *RestfulParser) Subscribe(address string) (bool, error) {
 	// Extend other instances to store
+	address = strings.ToLower(address)
 	log.Printf("Trying to subscribe to address %s", address)
 	err := storage.MemoryStorageInstance.SaveSubscriber(address)
 	if err != nil {
@@ -65,6 +66,7 @@ func (rp *RestfulParser) Subscribe(address string) (bool, error) {
 
 func (rp *RestfulParser) GetTransactions(address string) ([]models.Transaction, error) {
 	// Extend other instances to store
+	address = strings.ToLower(address)
 	log.Printf("Trying to get transactions for address %s", address)
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
 	if _, exists := subscribers[address]; !exists {
@@ -110,6 +112,7 @@ func singleListener() {
 		}
 		models.MemoryInstance.RecordedTxHashes[transaction.Hash] = true
 		mu.Unlock()
+		fmt.Print(transaction.From, transaction.To, transaction.Value, transaction.Hash)
 
 		if _, exists := subscribers[transaction.From]; exists {
 			saveTransaction := models.Transaction{
@@ -119,8 +122,11 @@ func singleListener() {
 				TcType: "outbound",
 				Hash:   transaction.Hash,
 			}
+			fmt.Println("Saved transaction %v for address %s", saveTransaction, transaction.From)
+
 			mu.Lock()
 			storage.MemoryStorageInstance.SaveTransaction(saveTransaction, transaction.From)
+			log.Printf("Saved transaction %v for address %s", saveTransaction, transaction.From)
 			mu.Unlock()
 		}
 		if _, exists := subscribers[transaction.To]; exists {
@@ -133,6 +139,8 @@ func singleListener() {
 			}
 			mu.Lock()
 			storage.MemoryStorageInstance.SaveTransaction(saveTransaction, transaction.To)
+			fmt.Println("Saved transaction %v for address %s", saveTransaction, transaction.To)
+			log.Printf("Saved transaction %v for address %s", saveTransaction, transaction.To)
 			mu.Unlock()
 		}
 	}

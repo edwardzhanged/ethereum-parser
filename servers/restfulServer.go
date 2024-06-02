@@ -26,15 +26,15 @@ func RestfulServerInitialize() {
 
 		// Parse form data
 		r.ParseForm()
-		topic := r.FormValue("address")
+		address := r.FormValue("address")
 
-		if topic == "" {
+		if address == "" {
 			http.Error(w, "Missing address parameter", http.StatusBadRequest)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		success, err := services.RestfulParserInstance.Subscribe(topic)
+		success, err := services.RestfulParserInstance.Subscribe(address)
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]any{"error": fmt.Sprintf("Error subscribing: %v", err), "success": success})
 			return
