@@ -44,7 +44,6 @@ Then
 make test
 ```
 
-
 ## Usages
 
 To get current block
