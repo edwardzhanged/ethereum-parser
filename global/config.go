@@ -13,7 +13,7 @@ type Config struct {
 
 var GlobalConfig *Config
 
-func Initialize() {
+func GlobalInitialize() {
 	file, err := os.Open("config.json")
 	if err != nil {
 		log.Fatal("Error opening config file. Please make sure it exists.")

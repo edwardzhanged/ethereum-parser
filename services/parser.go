@@ -8,5 +8,5 @@ type Parser interface {
 	// add address to observer
 	Subscribe(address string) (bool, error)
 	// list of inbound or outbound transactions for an address
-	GetTransactions(address string) []models.Transaction
+	GetTransactions(address string) ([]models.Transaction, error)
 }

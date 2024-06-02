@@ -15,17 +15,25 @@ import (
 )
 
 type RestfulParser struct {
-	ctx context.Context
+	ctx            context.Context
+	GetLatestBlock func() ([]utils.Transaction, string, error)
 }
 
 var (
-	MyParser *RestfulParser
-	mu       sync.Mutex
+	RestfulParserInstance *RestfulParser
+	mu                    sync.Mutex
 )
 
+func RestfulParserInitialize() {
+	RestfulParserInstance = &RestfulParser{
+		ctx:            context.Background(),
+		GetLatestBlock: utils.GetLatestBlock,
+	}
+	go RestfulParserInstance.startListeners()
+}
+
 func (rp *RestfulParser) GetCurrentBlock() (int, error) {
-	rp.ctx = context.Background()
-	_, currentBlockStr, err := utils.GetLatestBlock()
+	_, currentBlockStr, err := rp.GetLatestBlock()
 	if err != nil {
 		log.Println(err)
 		return 0, fmt.Errorf("failed to request latest block: %v", err)
@@ -45,17 +53,22 @@ func (rp *RestfulParser) GetCurrentBlock() (int, error) {
 }
 
 func (rp *RestfulParser) Subscribe(address string) (bool, error) {
+	// Extend other instances to store
+	log.Printf("Trying to subscribe to address %s", address)
 	err := storage.MemoryStorageInstance.SaveSubscriber(address)
 	if err != nil {
-		log.Printf("failed to save subscriber: %v", err)
+		log.Printf("Failed to save subscriber: %v", err)
 		return false, err
 	}
 	return true, nil
 }
 
 func (rp *RestfulParser) GetTransactions(address string) ([]models.Transaction, error) {
+	// Extend other instances to store
+	log.Printf("Trying to get transactions for address %s", address)
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
 	if _, exists := subscribers[address]; !exists {
+		log.Printf("Failed to get transactions: address %s is not subscribed", address)
 		return nil, fmt.Errorf("address %s is not subscribed", address)
 	}
 	transactions, _ := storage.MemoryStorageInstance.GetTransactions(address)
@@ -70,7 +83,6 @@ func (rp *RestfulParser) startListeners() {
 		go func(id int) {
 			for {
 				singleListener()
-
 				time.Sleep(1 * time.Second)
 			}
 		}(i)
@@ -89,13 +101,14 @@ func singleListener() {
 	log.Printf("On latest block, Transactions: %v", transactions)
 
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
+	// Filter transactions for subscribers
 	for _, transaction := range transactions {
 		mu.Lock()
-		if _, exists := models.MyMemory.RecordedTxHashes[transaction.Hash]; exists {
+		if _, exists := models.MemoryInstance.RecordedTxHashes[transaction.Hash]; exists {
 			mu.Unlock()
 			continue
 		}
-		models.MyMemory.RecordedTxHashes[transaction.Hash] = true
+		models.MemoryInstance.RecordedTxHashes[transaction.Hash] = true
 		mu.Unlock()
 
 		if _, exists := subscribers[transaction.From]; exists {
@@ -124,10 +137,4 @@ func singleListener() {
 		}
 	}
 	time.Sleep(time.Second)
-
-}
-
-func InitRestfulParser() {
-	MyParser = &RestfulParser{}
-	go MyParser.startListeners()
 }

@@ -18,13 +18,14 @@ func main() {
 		log.Fatal("Failed to open log file:", err)
 	}
 	defer file.Close()
-
 	log.SetOutput(file)
-	global.Initialize()
+
+	// Initalize
+	global.GlobalInitialize()
 	models.MemoryInitialize()
 	storage.NewMemoryStorage()
-	services.InitRestfulParser()
+	services.RestfulParserInitialize()
 
 	fmt.Println("Server is running on port http://127.0.0.1:8080")
-	servers.InitrestfulServer()
+	servers.RestfulServerInitialize()
 }

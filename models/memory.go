@@ -26,19 +26,16 @@ type Transaction struct {
 }
 
 type CurrentBlock struct {
-	// CurrentBlock is a struct that holds the details of the current block.
 	// The number of the current block.
 	Number int
 	// The hash of the current block.
 	Hash string
 }
 
-var MyMemory *Memory
+var MemoryInstance *Memory
 
 func MemoryInitialize() {
-	// Initialize is a function that initializes the global memory.
-	// Initialize the global memory.
-	MyMemory = &Memory{
+	MemoryInstance = &Memory{
 		Addresses:        map[string]bool{},
 		Transactions:     map[string][]Transaction{},
 		CurrentBlock:     CurrentBlock{},

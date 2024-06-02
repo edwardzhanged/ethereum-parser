@@ -13,4 +13,4 @@ test:
 # Clean up
 clean:
 	go clean
-	rm -f myapp
+	rm -f $(BINARY_NAME)

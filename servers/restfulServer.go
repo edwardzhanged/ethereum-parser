@@ -7,9 +7,9 @@ import (
 	"net/http"
 )
 
-func InitrestfulServer() {
+func RestfulServerInitialize() {
 	http.HandleFunc("/currentBlock", func(w http.ResponseWriter, r *http.Request) {
-		currentBlock, err := services.MyParser.GetCurrentBlock()
+		currentBlock, err := services.RestfulParserInstance.GetCurrentBlock()
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]any{"error": fmt.Sprintf("Error getting current block: %v", err), "success": false})
@@ -19,13 +19,22 @@ func InitrestfulServer() {
 	})
 
 	http.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		topic := r.URL.Query().Get("address")
-		if topic == "" {
-			http.Error(w, "Missing adrress parameter", http.StatusBadRequest)
+		if r.Method != http.MethodPost {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 			return
 		}
+
+		// Parse form data
+		r.ParseForm()
+		topic := r.FormValue("address")
+
+		if topic == "" {
+			http.Error(w, "Missing address parameter", http.StatusBadRequest)
+			return
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		success, err := services.MyParser.Subscribe(topic)
+		success, err := services.RestfulParserInstance.Subscribe(topic)
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]any{"error": fmt.Sprintf("Error subscribing: %v", err), "success": success})
 			return
@@ -41,7 +50,7 @@ func InitrestfulServer() {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		transactions, err := services.MyParser.GetTransactions(address)
+		transactions, err := services.RestfulParserInstance.GetTransactions(address)
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{"error": fmt.Sprintf("Error getting transactions: %v", err), "success": false})
 			return

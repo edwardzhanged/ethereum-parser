@@ -40,20 +40,18 @@ func GetLatestBlock() (transactions []Transaction, number string, err error) {
 	}`))
 
 	resp, err := http.Post(global.GlobalConfig.Endpoint, "application/json", reqBody)
+
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to send request: %v", err)
 	}
+	defer resp.Body.Close()
 
-	// TODO: Handle response here
-	// resp.Body.Close()
 	responseStruct := &Response{}
 	err = json.NewDecoder(resp.Body).Decode(responseStruct)
 	if err != nil {
 		log.Printf("Failed to decode response: %v", err)
 	}
 
-	// Now you can access the fields in the response
-	// log.Printf("transactions: %s, hash: %s", responseStruct.Result.Transactions, responseStruct.Result.Hash)
 	transactions, number = responseStruct.Result.Transactions, responseStruct.Result.Number
 
 	return transactions, number, nil

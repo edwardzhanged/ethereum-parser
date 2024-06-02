@@ -3,6 +3,7 @@ package storage
 import (
 	models "ethereum-parser/models"
 	"fmt"
+	"log"
 )
 
 // MemoryStorage is an in-memory implementation of the Storage interface.
@@ -14,7 +15,7 @@ var MemoryStorageInstance *MemoryStorage
 
 func NewMemoryStorage() {
 	MemoryStorageInstance = &MemoryStorage{
-		data: models.MyMemory,
+		data: models.MemoryInstance,
 	}
 }
 
@@ -23,7 +24,7 @@ func (m *MemoryStorage) SaveSubscriber(subscriber string) error {
 		return fmt.Errorf("address %s already exists", subscriber)
 	}
 	m.data.Addresses[subscriber] = true
-
+	log.Printf("Saved subscriber %s", subscriber)
 	return nil
 }
 
@@ -33,6 +34,7 @@ func (m *MemoryStorage) GetSubscribers() (map[string]bool, error) {
 
 func (m *MemoryStorage) SaveTransaction(transaction models.Transaction, address string) error {
 	m.data.Transactions[address] = append(m.data.Transactions[address], transaction)
+	log.Printf("Saved transaction %v for address %s", transaction, address)
 	return nil
 }
 
