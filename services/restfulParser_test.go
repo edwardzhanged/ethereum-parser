@@ -30,12 +30,12 @@ func TestSubscribe(t *testing.T) {
 	storage.NewMemoryStorage()
 	rp := &RestfulParser{}
 
-	_, err := rp.Subscribe("testAddress")
+	_, err := rp.Subscribe("testaddress")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if models.MemoryInstance.Addresses["testAddress"] != true {
-		t.Errorf("Expected true, got %v", models.MemoryInstance.Addresses["testAddress"])
+	if models.MemoryInstance.Addresses["testaddress"] != true {
+		t.Errorf("Expected true, got %v", models.MemoryInstance.Addresses["testaddress"])
 	}
 }
 
@@ -45,11 +45,11 @@ func TestGetTransactions(t *testing.T) {
 
 	rp := &RestfulParser{}
 
-	models.MemoryInstance.Addresses["testAddress"] = true
-	expectedTransaction := []models.Transaction{{From: "A", To: "B", Value: "1", TcType: "type", Hash: "hash"}}
-	models.MemoryInstance.Transactions["testAddress"] = expectedTransaction
+	models.MemoryInstance.Addresses["testaddress"] = true
+	expectedTransaction := []models.Transaction{{From: "a", To: "b", Value: "1", TcType: "type", Hash: "hash"}}
+	models.MemoryInstance.Transactions["testaddress"] = expectedTransaction
 
-	transactions, err := rp.GetTransactions("testAddress")
+	transactions, err := rp.GetTransactions("testaddress")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
