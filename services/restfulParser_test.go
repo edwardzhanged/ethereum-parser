@@ -60,7 +60,6 @@ func TestGetTransactions(t *testing.T) {
 }
 
 func TestFilterTransactionsForSubscribers(t *testing.T) {
-	// 1. 创建模拟的交易和订阅者
 	models.MemoryInitialize()
 	storage.NewMemoryStorage()
 
