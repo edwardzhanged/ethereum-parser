@@ -53,9 +53,9 @@ func (rp *RestfulParser) GetCurrentBlock() (int, error) {
 }
 
 func (rp *RestfulParser) Subscribe(address string) (bool, error) {
-	// Extend other instances to store
 	address = strings.ToLower(address)
 	log.Printf("Trying to subscribe to address %s", address)
+	// Extend other instances to store
 	err := storage.MemoryStorageInstance.SaveSubscriber(address)
 	if err != nil {
 		log.Printf("Failed to save subscriber: %v", err)
@@ -65,9 +65,9 @@ func (rp *RestfulParser) Subscribe(address string) (bool, error) {
 }
 
 func (rp *RestfulParser) GetTransactions(address string) ([]models.Transaction, error) {
-	// Extend other instances to store
 	address = strings.ToLower(address)
 	log.Printf("Trying to get transactions for address %s", address)
+	// Extend other instances to store
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
 	if _, exists := subscribers[address]; !exists {
 		log.Printf("Failed to get transactions: address %s is not subscribed", address)
@@ -102,6 +102,7 @@ func singleListener() {
 	log.Printf("On latest block, number: %s", number)
 	log.Printf("On latest block, Transactions: %v", transactions)
 
+	// Extend other instances to store
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
 	// Filter transactions for subscribers
 	filterTransactionsForSubscribers(transactions, subscribers)

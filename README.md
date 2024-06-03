@@ -28,7 +28,7 @@ make build
 ```
 
 ### Run
-Your working path should cotain cofig.json. For example:
+Your working path should contain config.json. For example:
 ```bash
 {
     "endpoint": "https://cloudflare-eth.com"
