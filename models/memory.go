@@ -1,7 +1,6 @@
 package models
 
 type Memory struct {
-	// Memory is a struct that holds the memory of the Ethereum Virtual Machine.
 	// List of addresses that have been observed.
 	Addresses        map[string]bool
 	Transactions     map[string][]Transaction
@@ -9,10 +8,7 @@ type Memory struct {
 	RecordedTxHashes map[string]bool
 }
 
-// type Memory map[string]interface{}
-
 type Transaction struct {
-	// Transaction is a struct that holds the details of a transaction.
 	// The address of the sender.
 	From string
 	// The address of the receiver.

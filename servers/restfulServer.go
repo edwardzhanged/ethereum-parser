@@ -24,7 +24,6 @@ func RestfulServerInitialize() {
 			return
 		}
 
-		// Parse form data
 		r.ParseForm()
 		address := r.FormValue("address")
 

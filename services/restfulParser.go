@@ -104,6 +104,11 @@ func singleListener() {
 
 	subscribers, _ := storage.MemoryStorageInstance.GetSubscribers()
 	// Filter transactions for subscribers
+	filterTransactionsForSubscribers(transactions, subscribers)
+	time.Sleep(time.Second)
+}
+
+func filterTransactionsForSubscribers(transactions []utils.Transaction, subscribers map[string]bool) {
 	for _, transaction := range transactions {
 		mu.Lock()
 		if _, exists := models.MemoryInstance.RecordedTxHashes[transaction.Hash]; exists {
@@ -141,5 +146,4 @@ func singleListener() {
 			mu.Unlock()
 		}
 	}
-	time.Sleep(time.Second)
 }

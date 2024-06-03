@@ -58,3 +58,33 @@ func TestGetTransactions(t *testing.T) {
 		t.Errorf("Expected %v, got %v", expectedTransaction, transactions)
 	}
 }
+
+func TestFilterTransactionsForSubscribers(t *testing.T) {
+	// 1. 创建模拟的交易和订阅者
+	models.MemoryInitialize()
+	storage.NewMemoryStorage()
+
+	transactions := []utils.Transaction{
+		{From: "a", To: "b", Value: "1", Hash: "hash1"},
+		{From: "b", To: "c", Value: "2", Hash: "hash2"},
+	}
+	subscribers := map[string]bool{
+		"a": true,
+		"c": true,
+	}
+
+	filterTransactionsForSubscribers(transactions, subscribers)
+
+	if models.MemoryInstance.Transactions["a"][0].Hash != "hash1" {
+		t.Errorf("Expected %v, got %v", "hash1", models.MemoryInstance.Transactions["a"][0].Hash)
+	}
+	if models.MemoryInstance.Transactions["c"][0].Hash != "hash2" {
+		t.Errorf("Expected %v, got %v", "hash2", models.MemoryInstance.Transactions["c"][0].Hash)
+	}
+	if models.MemoryInstance.Transactions["a"][0].TcType != "outbound" {
+		t.Errorf("Expected %v, got %v", "outbound", models.MemoryInstance.Transactions["a"][0].TcType)
+	}
+	if models.MemoryInstance.Transactions["c"][0].TcType != "inbound" {
+		t.Errorf("Expected %v, got %v", "inbound", models.MemoryInstance.Transactions["c"][0].TcType)
+	}
+}
